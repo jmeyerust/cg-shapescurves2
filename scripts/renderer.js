@@ -72,14 +72,19 @@ class Renderer {
     drawSlide2(framebuffer) {
         // TODO: draw at least 2 convex polygons (each with a different number of vertices >= 5)
         //   - variable `this.show_points` should be used to determine whether or not to render vertices
+
+        let vertex_list1 = [{x:  80, y:  100}, {x: 320, y: 200}, {x: 240, y: 400}, {x: 240, y:100}, {x: 400, y: 300}];
+        let vertex_list2 = [{x:  480, y:  100}, {x: 720, y: 200}, {x: 640, y: 400}, {x: 640, y:100}, {x: 800, y: 300}];
         
-        
-        // Following lines are example of drawing a single triangle
-        // (this should be removed after you implement the polygon)
-        let point_a = {x:  80, y:  40};
-        let point_b = {x: 320, y: 160};
-        let point_c = {x: 240, y: 360};
-        this.drawTriangle(point_a, point_c, point_b, [0, 128, 128, 255], framebuffer);
+        if (this.showPoints) {
+            vertex_list1.forEach((vertex) => {
+                this.drawVertex(vertex, [0, 0, 0, 255], framebuffer);
+            });
+        }
+
+        this.drawConvexPolygon(vertex_list1, [255, 0, 0, 255], framebuffer);
+        this.drawConvexPolygon(vertex_list2, [0, 0, 255, 255], framebuffer);
+
     }
 
     // framebuffer:  canvas ctx image data
@@ -120,6 +125,9 @@ class Renderer {
     // framebuffer:  canvas ctx image data
     drawConvexPolygon(vertex_list, color, framebuffer) {
         // TODO: draw a sequence of triangles to form a convex polygon
+        for (let i=2; i < vertex_list.length; i ++) {
+            this.drawTriangle(vertex_list[i-2], vertex_list[i-1], vertex_list[i], color, framebuffer);
+        }
         
         
     }
@@ -129,7 +137,14 @@ class Renderer {
     // framebuffer:  canvas ctx image data
     drawVertex(v, color, framebuffer) {
         // TODO: draw some symbol (e.g. small rectangle, two lines forming an X, ...) centered at position `v`
-        
+        let v0 = {x: (v.x + 5), y: (v.y + 5)}; // Up and to the right
+        let v1 = {x: (v.x + 5), y: (v.y - 5)}; // Down and to the right
+        let v2 = {x: (v.x - 5), y: (v.y + 5)}; // Up and to the left
+        let v3 = {x: (v.x - 5), y: (v.y - 5)}; // Down and to the left
+
+        let v_list = [v, v0, v1, v2, v3];
+
+        this.drawConvexPolygon(v_list, color, framebuffer);
         
     }
     
@@ -189,7 +204,7 @@ class Renderer {
         let px;
         while (x <= x1)
         {
-            px = this.pixelIndex(x, y, framebuffer);
+            px = this.pixelIndex(x, y, framebuffer); // framebuffer width being read as low
             this.setFramebufferColor(framebuffer, px, color);
             x += 1;
             if (D <= 0)
@@ -234,11 +249,12 @@ class Renderer {
     }
     
     drawTriangle(p0, p1, p2, color, framebuffer) {
+
         // Sort points in ascending y order
         if (p1.y < p0.y) this.swapPoints(p0, p1);
         if (p2.y < p0.y) this.swapPoints(p0, p2);
         if (p2.y < p1.y) this.swapPoints(p1, p2);
-        
+
         // Edge coherence triangle algorithm
         // Create initial edge table
         let edge_table = [
