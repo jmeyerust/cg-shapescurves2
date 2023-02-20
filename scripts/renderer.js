@@ -53,20 +53,27 @@ class Renderer {
         //   - variable `this.num_curve_sections` should be used for `num_edges`
         //   - variable `this.show_points` should be used to determine whether or not to render vertices
         
-        /*
+        
 
         let p0 = {x: 100, y: 100};
         let p1 = {x: 100, y: 200};
         let p2 = {x: 300, y: 200};
         let p3 = {x: 300, y: 100};
 
+        if (this.show_points) {
+            this.drawVertex(p0, [255,0,0,255], framebuffer);
+            this.drawVertex(p1, [255,0,0,255], framebuffer);
+            this.drawVertex(p2, [255,0,0,255], framebuffer);
+            this.drawVertex(p3, [255,0,0,255], framebuffer);
+        }
+
         this.drawBezierCurve(p0, p1, p2, p3, this.num_curve_sections, [255, 0, 0, 255], framebuffer);
         
 
-        */ 
+        
         // Following line is example of drawing a single line
         // (this should be removed after you implement the curve)
-        this.drawLine({x: 100, y: 100}, {x: 600, y: 300}, [255, 0, 0, 255], framebuffer);
+        //this.drawLine({x: 100, y: 100}, {x: 600, y: 300}, [255, 0, 0, 255], framebuffer);
     }
 
     // framebuffer:  canvas ctx image data
@@ -122,29 +129,29 @@ class Renderer {
     drawBezierCurve(p0, p1, p2, p3, num_edges, color, framebuffer) {
         // TODO: draw a sequence of straight lines to approximate a Bezier curve
         // Make empty list of points
-        let points = [p0];
+        let points = [{x: p0.x, y: p0.y}];
 
         // Generate each point using function
-        let t = 1 / num_edges;
-        for (let i = 1; i <= num_edges; i++) {
-            t = t * i;
-            let new_x = ((1 - t)**3) * p0.x + (3 * (1 - t)**2 * t * p1.x) + (3 * (1-t) * t**2 * p2.x) + t**3 * p3.x;
-            let new_y = ((1 - t)**3) * p0.y + (3 * (1 - t)**2 * t * p1.y) + (3 * (1-t) * t**2 * p2.y) + t**3 * p3.y;
+        let j = 1 / num_edges;
+        for (let i = 1; i < num_edges; i++) {
+            let t = j * i;
+            let new_x = (((1 - t)**3) * p0.x) + (3 * ((1 - t)**2) * t * p1.x) + (3 * (1-t) * t**2 * p2.x) + (t**3 * p3.x);
+            let new_y = (((1 - t)**3) * p0.y) + (3 * ((1 - t)**2) * t * p1.y) + (3 * (1-t) * t**2 * p2.y) + (t**3 * p3.y);
+            console.log(new_x);
+            console.log(new_y);
             points[i] = {x: new_x, y: new_y};
         }
-        points[num_edges+1] = p3;
+        points[num_edges] = {x: p3.x, y: p3.y};
 
+        console.log(points.length);
+        
         //Draw list of points
         for (let i = 1; i < points.length; i++) {
+            console.log(i);
+            console.log("   (" + points[i-1].x + " , " + points[i-1].y + ")");
+            console.log("   (" + points[i].x + " , " + points[i].y + ")");
             this.drawLine(points[i-1], points[i], color, framebuffer);
         }
-
-        if (this.show_points) {
-            points.forEach((vertex) => {
-                this.drawVertex(vertex);
-            });
-        }
-        
     }
     
     
