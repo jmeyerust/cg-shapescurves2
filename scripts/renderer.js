@@ -56,18 +56,28 @@ class Renderer {
         
 
         let p0 = {x: 100, y: 100};
-        let p1 = {x: 100, y: 200};
-        let p2 = {x: 300, y: 200};
+        let p1 = {x: 120, y: 200};
+        let p2 = {x: 320, y: 150};
         let p3 = {x: 300, y: 100};
+
+        let p4 = {x: 400, y: 100};
+        let p5 = {x: 460, y: 400};
+        let p6 = {x: 550, y: 326};
+        let p7 = {x: 600, y: 100};
 
         if (this.show_points) {
             this.drawVertex(p0, [255,0,0,255], framebuffer);
             this.drawVertex(p1, [255,0,0,255], framebuffer);
             this.drawVertex(p2, [255,0,0,255], framebuffer);
             this.drawVertex(p3, [255,0,0,255], framebuffer);
+            this.drawVertex(p4, [255,0,0,255], framebuffer);
+            this.drawVertex(p5, [255,0,0,255], framebuffer);
+            this.drawVertex(p6, [255,0,0,255], framebuffer);
+            this.drawVertex(p7, [255,0,0,255], framebuffer);
         }
 
         this.drawBezierCurve(p0, p1, p2, p3, this.num_curve_sections, [255, 0, 0, 255], framebuffer);
+        this.drawBezierCurve(p4, p5, p6, p7, this.num_curve_sections, [255, 0, 0, 255], framebuffer);
         
 
         
@@ -129,14 +139,15 @@ class Renderer {
     drawBezierCurve(p0, p1, p2, p3, num_edges, color, framebuffer) {
         // TODO: draw a sequence of straight lines to approximate a Bezier curve
         // Make empty list of points
-        let points = [{x: p0.x, y: p0.y}];
+        let points = new Array(num_edges + 1);
+        points[0] = {x: p0.x, y: p0.y};
 
         // Generate each point using function
         let j = 1 / num_edges;
         for (let i = 1; i < num_edges; i++) {
             let t = j * i;
-            let new_x = (((1 - t)**3) * p0.x) + (3 * ((1 - t)**2) * t * p1.x) + (3 * (1-t) * t**2 * p2.x) + (t**3 * p3.x);
-            let new_y = (((1 - t)**3) * p0.y) + (3 * ((1 - t)**2) * t * p1.y) + (3 * (1-t) * t**2 * p2.y) + (t**3 * p3.y);
+            let new_x = parseInt((((1 - t)**3) * p0.x) + (3 * ((1 - t)**2) * t * p1.x) + (3 * (1-t) * t**2 * p2.x) + (t**3 * p3.x));
+            let new_y = parseInt((((1 - t)**3) * p0.y) + (3 * ((1 - t)**2) * t * p1.y) + (3 * (1-t) * t**2 * p2.y) + (t**3 * p3.y));
             console.log(new_x);
             console.log(new_y);
             points[i] = {x: new_x, y: new_y};
@@ -145,7 +156,7 @@ class Renderer {
 
         console.log(points.length);
         
-        //Draw list of points
+        //Draw line between each two points
         for (let i = 1; i < points.length; i++) {
             console.log(i);
             console.log("   (" + points[i-1].x + " , " + points[i-1].y + ")");
